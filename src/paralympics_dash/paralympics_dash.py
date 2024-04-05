@@ -1,6 +1,13 @@
 # Version after the final activity in week 6
-from dash import Dash, html
+from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
+from dash import Input, Output
+
+# Add an import to import the line_chart function
+from paralympics_dash.figures import line_chart
+
+# Create the Plotly Express line chart object, e.g. to show number of sports
+line = line_chart("sports")
 
 # Variable that contains the external_stylesheet to use, in this case Bootstrap styling from dash bootstrap
 # components (dbc)
@@ -85,10 +92,10 @@ row_two = dbc.Row([
 
 row_three = dbc.Row([
     dbc.Col(children=[
+        # Add this line:
+        dcc.Graph(id="line", figure=line),
+        # Delete this line:
         html.Img(src=app.get_asset_url('line-chart-placeholder.png'), className="img-fluid"),
-    ], width=4),
-    dbc.Col(children=[
-        html.Img(src=app.get_asset_url('bar-chart-placeholder.png'), className="img-fluid"),
     ], width=4),
 ], align="start")
 
@@ -109,6 +116,14 @@ app.layout = dbc.Container([
     row_three,
     row_four,
 ])
+
+@app.callback(
+    Output(component_id='line', component_property='figure'),
+    Input(component_id='type-dropdown', component_property='value')
+)
+def update_line_chart(chart_type):
+    figure = line_chart(chart_type)
+    return figure
 
 # Run the Dash app
 if __name__ == '__main__':
